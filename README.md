@@ -4,13 +4,17 @@ A Hackathon Project for Robert Bosch Engineering and Business Solutions
 
 ## Instructors to setup the lab environment
 
+The below steps only provide an overview, please use the notebook for code artifacts for each of the steps. 
+
 ### Data Preparation
 
 - Clone this folder into your workstation (GPU enabled), lets call this folder `workspace`. 
-- Download the raw data zip from [here]() to the workspace folder. The raw data contains images, csv (training.csv) file containing a record per bounding box on the image. 
+- Download the raw data zip from [here](https://drive.google.com/file/d/1HxCIZDXQ9U3j7LtxLs-n17E3kmDijMhX/view?usp=sharing) to the workspace folder. The raw data contains images, csv (training.csv) file containing a record per bounding box on the image. 
 - Upload the zip file to your workspace and unzip. Ensure the variable `raw_data` points to the location of the raw data.
 
 ### Pre-processing
+
+The raw data contains the ~7900 tagged images (the tags are available inside the training_data.csv file per image) and 130002 tags across all images. Pre-processing involves converting this data into a format which darknet's yolov4 algorithm understands. 
 
 Open the Jupyter notebook, and run the below steps
 
@@ -26,15 +30,16 @@ current = '.'
   
 ```
 from sklearn.model_selection import train_test_split
-df_train, df_val = train_test_split(df, test_size = 0.1, shuffle=True, random_state=42)
+df_train, df_val = train_test_split(df, test_size = 0.2, shuffle=True, random_state=42)
 ```
-- Clone the darknet directory 
-- Split the data into train and validation folders, and creating corresponding train.txt, test.txt files for feeding to darknet.
+- Clone the darknet directory, this folder is needed because the training data is cretaed under darknet/data in the step below. 
+- Split the data into train and validation folders. In each folder we have the training images and a .txt file per image which contains the details of the bounding box. 
+- The notebook also creates a train.txt and test.txt files which contains the path to images that will be used for training and validation.
+  
+### How to Train
 
-### Training
-
-- Clone and Compile darknet
-- Training with Tiny Config
+- Compile darknet
+- Training with Tiny Config (approx 2-3 hours)
   - Copy the yolov4-tiny-custom.cfg to darknet/cfg
   - Download pre-training model 
     ```
@@ -43,7 +48,7 @@ df_train, df_val = train_test_split(df, test_size = 0.1, shuffle=True, random_st
   - Run the training
     ```
     !darknet/darknet detector train obj.data darknet/cfg/yolov4-tiny-custom.cfg yolov4-tiny.conv.29 -map -dont_show```
-- Training with full config
+- Training with full config (approx 8 hours)
   - Copy the yolov4-custom.cfg to darknet/cfg
   - Download pre-training model 
     ```
@@ -53,18 +58,23 @@ df_train, df_val = train_test_split(df, test_size = 0.1, shuffle=True, random_st
     ```
     !darknet/darknet detector train obj.data darknet/cfg/yolov4-custom.cfg yolov4.conv.137 -map -dont_show```
 
-### Training Results
+### About the outcome of training
 
 The below images show how the training has progressed for both Tiny and full configuration. 
 
 - Run log with Tiny Configuration
+  
+The highest mAP was 70% 
 
 ![Results](images/yolov4-tiny-custom.png)
 
 - Run log with Full Configuration
 
+The highest mAP was 77%
+
 ![Results](images/yolov4-custom.png)
 
+The data used for the training is created from scratch no public datasets are used, hence the model can further be improved with more variety of training data. 
 
 ### Inference
 
@@ -92,6 +102,26 @@ Here is an example
 ```
 
 5. The results of the test are stored in predictions.jpg
+
+### Test Results
+
+Here are some key results. 
+
+| | Yolov4 Tiny| Yolov4 Full|
+|--|--|-|
+| mean Average Precision | 70 | 77 |
+| Inference Time | 2.9 ms | 20 ms |
+| Size of the Model | 22 mb | 244 mb |
+
+The model is tested on Tesla P100 
+
+#### Results from Tiny Config
+
+![Results](results/tiny/test_2.jpg)
+
+#### Results from Full Config
+
+![Results](results/full/test_2.jpg)
 
 ### Miscelleneous
 

@@ -2,6 +2,11 @@
 
 A Hackathon Project for Robert Bosch Engineering and Business Solutions
 
+Business Problem
+- Identify household objects on the floor at low latency high MAP
+- Model should be smaller, inference should work on CPU [<1GB, 1-2 core CPU] for edge devices like cleaners
+- Models should be incrementally updatable
+
 ## Instructors to setup the lab environment
 
 The below steps only provide an overview, please use the notebook for code artifacts for each of the steps. 
